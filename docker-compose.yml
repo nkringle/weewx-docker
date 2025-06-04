@@ -4,14 +4,33 @@ services:
   weewx-core:
     build: .
     environment:
-      - TZ='America/Chicago'
+      - TZ=America/Chicago
+    network_mode: host
     volumes:
     #  WeeWx needs to know the local time of the server, hance mounting localtime as read only. 
-      - /etc/localtime:/etc/localtime:ro
+      #- /etc/localtime:/etc/localtime:ro
       - ./data/weewx.conf:/home/weewx/weewx-data/weewx.conf
-      - ./data/neowx-material/skin.conf:/home/weewx/weewx-data/neowx-material/skin.conf
-      - ./data/JSON/skin.conf:/home/weewx/weewx-data/JSON/skin.conf
-      - ./data/JSON/weewx-homebridge.json.tmpl:/home/weewx/weewx-data/JSON/weewx-homebridge.json.tmpl
-      - ./data/archive:/home/weewx/weewx-data/archive
+      - ./data/skins/neowx-material/skin.conf:/home/weewx/weewx-data/skins/neowx-material/skin.conf
+      - ./data/skins/neowx-material/weathertv.html.tmpl:/home/weewx/weewx-data/skins/neowx-material/weathertv.html.tmpl
+      - ./data/skins/JSON/skin.conf:/home/weewx/weewx-data/skins/JSON/skin.conf
+      - ./data/skins/JSON/weewx-homebridge.json.tmpl:/home/weewx/weewx-data/skins/JSON/weewx-homebridge.json.tmpl
       - ./data/public_html:/home/weewx/weewx-data/public_html
+    restart: unless-stopped
+  ws4kp:
+    image: ghcr.io/netbymatt/ws4kp
+    container_name: ws4kp
+    environment: 
+      # See https://github.com/netbymatt/ws4kp for details on this container
+      # Each argument in the permalink URL can become an environment variable on the Docker host by adding WSQS_
+      # Following the "Sharing a Permalink" example below, here are a few environment variables defined. Visit that section for a
+      # more complete list of configuration options.
+      # - WSQS_latLonQuery="Orlando International Airport Orlando FL USA"
+      #- WSQS_hazards_checkbox=false
+      #- WSQS_current_weather_checkbox=true
+
+    # uncomment the next two lines if you want to use your own music
+    # volumes: 
+      # - ./ws4kp/music:/app/server/music 
+    ports:
+      - 8079:8080 # change the first 8080 to meet your local network needs
     restart: unless-stopped
