@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-rsyslogd 
-exec gosu weewx weewxd "$@"
+# Ensure permissions are correct for mounted volumes
+chown -R weewx:weewx /home/weewx/weewx-data || true
 
-exec "$@"
+exec gosu weewx weewxd "$@"

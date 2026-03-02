@@ -1,23 +1,57 @@
-FROM python:3.10-slim-bullseye 
+FROM python:3.12-slim-bookworm
 
-RUN pip install wheel paho-mqtt==2 weewx==5.0.2 ephem==4.1.5
-RUN apt-get update && apt-get install rsyslog gosu -y && rm -rf /var/lib/apt/lists/*
+ENV MQTTSUBSCRIBE_VERSION=3.1.1 \
+    NEOWX_VERSION=1.11 \
+    WEEWXJSON_VERSION=1.3 \ 
+    PAHOMQTT_VERSION=2 \
+    WEEWX_VERSION=5.3.0 \
+    EPHEM_VERSION=4.1.5
 
+
+# System deps:
+# - rsyslog: used during build for weectl steps that expect syslog
+# - gosu: drop privileges to weewx user
+# - gcc: build some python wheels if needed
+# - procps: provides pkill (and other proc tools)
+RUN apt-get update && apt-get install -y \
+    rsyslog \
+    gosu \
+    gcc \
+    procps \
+ && rm -rf /var/lib/apt/lists/*
+
+# Quiet rsyslog in containers: disable kernel logging (/proc/kmsg) which is blocked
+RUN sed -i 's/^\(module(load="imklog".*\)\s*$/# \1/' /etc/rsyslog.conf || true
+
+RUN pip install wheel paho-mqtt==${PAHOMQTT_VERSION} weewx==${WEEWX_VERSION} ephem==${EPHEM_VERSION}
 
 RUN useradd -ms /bin/bash weewx
-RUN sed -i '/imklog/s/^/#/' /etc/rsyslog.conf
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /home/weewx
+RUN chown weewx:weewx /home/weewx
+# Initialize weewx and install extensions
+RUN rsyslogd && gosu weewx weectl station create --no-prompt && pkill rsyslogd || true
 
-RUN rsyslogd & gosu weewx weectl station create --no-prompt 
-RUN rsyslogd & gosu weewx weectl extension install https://github.com/bellrichm/WeeWX-MQTTSubscribe/archive/refs/tags/v3.0.0.zip --yes
-RUN rsyslogd & gosu weewx weectl extension install https://github.com/neoground/neowx-material/releases/download/1.11/neowx-material-1.11.zip --yes
-RUN rsyslogd & gosu weewx weectl extension install https://github.com/teeks99/weewx-json/releases/download/v1.2/weewx-json_1.2.tar.gz --yes
-RUN rsyslogd & gosu weewx weectl station reconfigure --no-prompt --no-backup
+RUN rsyslogd && gosu weewx weectl extension install \
+    https://github.com/neoground/neowx-material/releases/download/${NEOWX_VERSION}/neowx-material-${NEOWX_VERSION}.zip \
+    --yes \
+ && pkill rsyslogd || true
 
+RUN rsyslogd && gosu weewx weectl extension install \
+    https://github.com/teeks99/weewx-json/releases/download/v${WEEWXJSON_VERSION}/weewx-json_${WEEWXJSON_VERSION}.tar.gz \
+    --yes \
+ && pkill rsyslogd || true
+
+RUN rsyslogd && gosu weewx weectl extension install \
+    https://github.com/weewx-mqtt/subscribe/archive/refs/tags/v${MQTTSUBSCRIBE_VERSION}.zip \
+    --yes \
+ && pkill rsyslogd || true
+
+RUN rsyslogd && gosu weewx weectl station reconfigure --no-prompt --no-backup && pkill rsyslogd || true
 COPY entry.sh /home/weewx/entry.sh
+RUN chmod 755 /home/weewx/entry.sh
 
 ENTRYPOINT ["/home/weewx/entry.sh"]

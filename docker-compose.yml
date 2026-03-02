@@ -3,6 +3,7 @@ services:
 
   weewx-core:
     build: .
+    image: weewx:1.0.0 #used to force updating the underlying image
     environment:
       - TZ=America/Chicago
     network_mode: host
@@ -20,11 +21,12 @@ services:
     image: ghcr.io/netbymatt/ws4kp
     container_name: ws4kp
     environment: 
+      - TZ=America/Chicago
+      - WSQS_latLonQuery=OHare International Airport Chicago IL USA
       # See https://github.com/netbymatt/ws4kp for details on this container
       # Each argument in the permalink URL can become an environment variable on the Docker host by adding WSQS_
       # Following the "Sharing a Permalink" example below, here are a few environment variables defined. Visit that section for a
       # more complete list of configuration options.
-      # - WSQS_latLonQuery="Orlando International Airport Orlando FL USA"
       #- WSQS_hazards_checkbox=false
       #- WSQS_current_weather_checkbox=true
 
