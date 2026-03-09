@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Ensure permissions are correct for mounted volumes
-chown -R weewx:weewx /home/weewx/weewx-data || true
+chown weewx:weewx /home/weewx/weewx-data/weewx.conf || true
+chown -R weewx:weewx /home/weewx/weewx-data/public_html || true
 
 exec gosu weewx weewxd "$@"
