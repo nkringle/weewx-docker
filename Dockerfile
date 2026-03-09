@@ -49,7 +49,7 @@ COPY overrides/neowx-material/skin.conf /home/weewx/weewx-data/skins/neowx-mater
 COPY overrides/neowx-material/weathertv.html.tmpl /home/weewx/weewx-data/skins/neowx-material/weathertv.html.tmpl
 
 #Aero overrides
-COPY overrides/Aero/skin.conf /home/weewx/weewx-data/skins/neowx-material/skin.conf
+COPY overrides/Aero/skin.conf /home/weewx/weewx-data/skins/Aero/skin.conf
 
 # JSON overrides
 COPY overrides/JSON/skin.conf /home/weewx/weewx-data/skins/JSON/skin.conf
