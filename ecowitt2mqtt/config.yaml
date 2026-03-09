@@ -1,0 +1,11 @@
+---
+
+# https://github.com/bachya/ecowitt2mqtt#configuration-file
+mqtt_broker: 192.168.120.20
+mqtt_topic: "ecowitt2mqtt/gw1"
+disable_calculated_data: true
+default_battery_strategy: numeric
+input_data_format: ecowitt
+output_unit_system: imperial
+input_unit_system: imperial
+# verbose: true
