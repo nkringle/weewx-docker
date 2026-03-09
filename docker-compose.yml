@@ -3,7 +3,7 @@ services:
 
   weewx-core:
     build: .
-    image: nickkringle-weewx:3.2.2
+    image: nickkringle-weewx:3.2.3
     environment:
       - TZ=America/Chicago
     network_mode: host
