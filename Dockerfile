@@ -40,7 +40,7 @@ RUN chown weewx:weewx /home/weewx/weewx-data/weewx.conf
 
 RUN gosu weewx weectl extension install https://github.com/neoground/neowx-material/releases/download/${NEOWX_VERSION}/neowx-material-${NEOWX_VERSION}.zip --yes
 RUN gosu weewx weectl extension install https://github.com/teeks99/weewx-json/releases/download/v${WEEWXJSON_VERSION}/weewx-json_${WEEWXJSON_VERSION}.tar.gz --yes
-RUN gosu weewx weectl extension install https://github.com/sankara/weewx-skin-aero/releases/download/v${AERO_VERSION}/weewx-aero-v${AERO_VERSION}.zip
+RUN gosu weewx weectl extension install https://github.com/sankara/weewx-skin-aero/releases/download/v${AERO_VERSION}/weewx-aero-v${AERO_VERSION}.zip --yes
 RUN gosu weewx weectl extension install https://github.com/weewx-mqtt/subscribe/archive/refs/tags/v${MQTTSUBSCRIBE_VERSION}.zip --yes
 
 
