@@ -1,0 +1,36 @@
+#encoding UTF-8
+## +-------------------------------------------------------------------------+
+## |    weathertv.html.tmpl                      Template file for "weathertv" page    |
+## +-------------------------------------------------------------------------+
+
+#attr $active_nav = 'weathertv'
+
+
+## +-------------------------------------------------------------------------+
+## | The main page layout                                                    |
+## +-------------------------------------------------------------------------+
+
+<!DOCTYPE html>
+<html lang="$Extras.language">
+<head>
+  <title>
+    $Extras.Translations[$Extras.language][$active_nav] | $station.location
+  </title>
+  #include "head.inc"
+</head>
+<body class="${Extras.Appearance.mode}-theme main-bg" ontouchstart="">
+
+#include "header.inc"
+
+<main>
+  <div class="container-fluid d-flex-xxl">
+    <iframe src="$Extras.weatherTVURL" style="border: 0; width:100%; height: 590px; overflow: auto;"></iframe>
+
+  </div>
+</main>
+
+#include "footer.inc"
+#include "js.inc"
+
+</body>
+</html>
