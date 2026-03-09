@@ -3,7 +3,7 @@ services:
 
   weewx-core:
     build: .
-    image: weewx:1.0.0 #used to force updating the underlying image
+    image: nickkringle-weewx:3.1.0
     environment:
       - TZ=America/Chicago
     network_mode: host
@@ -11,28 +11,39 @@ services:
     #  WeeWx needs to know the local time of the server, hance mounting localtime as read only. 
       #- /etc/localtime:/etc/localtime:ro
       - ./data/weewx.conf:/home/weewx/weewx-data/weewx.conf
-      - ./data/skins/neowx-material/skin.conf:/home/weewx/weewx-data/skins/neowx-material/skin.conf
-      - ./data/skins/neowx-material/weathertv.html.tmpl:/home/weewx/weewx-data/skins/neowx-material/weathertv.html.tmpl
-      - ./data/skins/JSON/skin.conf:/home/weewx/weewx-data/skins/JSON/skin.conf
-      - ./data/skins/JSON/weewx-homebridge.json.tmpl:/home/weewx/weewx-data/skins/JSON/weewx-homebridge.json.tmpl
       - ./data/public_html:/home/weewx/weewx-data/public_html
     restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD-SHELL", "pgrep -f weewxd >/dev/null || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 60s
   ws4kp:
-    image: ghcr.io/netbymatt/ws4kp
+    image: ghcr.io/netbymatt/ws4kp:latest
     container_name: ws4kp
     environment: 
       - TZ=America/Chicago
-      - WSQS_latLonQuery=OHare International Airport Chicago IL USA
-      # See https://github.com/netbymatt/ws4kp for details on this container
+      - WSQS_latLonQuery=Des Moines International Airport Des Moines IA USA
+    # see https://github.com/netbymatt/ws4kp
       # Each argument in the permalink URL can become an environment variable on the Docker host by adding WSQS_
       # Following the "Sharing a Permalink" example below, here are a few environment variables defined. Visit that section for a
       # more complete list of configuration options.
       #- WSQS_hazards_checkbox=false
       #- WSQS_current_weather_checkbox=true
-
-    # uncomment the next two lines if you want to use your own music
-    # volumes: 
-      # - ./ws4kp/music:/app/server/music 
+    volumes:
+      - ./ws4kp/music:/app/server/music
     ports:
       - 8079:8080 # change the first 8080 to meet your local network needs
     restart: unless-stopped
+  ecowitt2mqtt:
+    image: bachya/ecowitt2mqtt:latest
+    container_name: eco2mqtt
+    environment:
+      - TZ=America/Chicago
+      - ECOWITT2MQTT_CONFIG=/app/config.yaml
+    volumes:
+      - ./ecowitt2mqtt/config.yaml:/app/config.yaml
+    ports:
+      - 8078:8080
+    
