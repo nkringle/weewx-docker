@@ -2,6 +2,7 @@ FROM python:3.12-slim-bookworm
 
 ENV MQTTSUBSCRIBE_VERSION=3.1.1 \
     NEOWX_VERSION=1.11 \
+    AERO_VERSION=2.7.0 \
     WEEWXJSON_VERSION=1.3 \
     PAHOMQTT_VERSION=2 \
     WEEWX_VERSION=5.3.0 \
@@ -39,12 +40,16 @@ RUN chown weewx:weewx /home/weewx/weewx-data/weewx.conf
 
 RUN gosu weewx weectl extension install https://github.com/neoground/neowx-material/releases/download/${NEOWX_VERSION}/neowx-material-${NEOWX_VERSION}.zip --yes
 RUN gosu weewx weectl extension install https://github.com/teeks99/weewx-json/releases/download/v${WEEWXJSON_VERSION}/weewx-json_${WEEWXJSON_VERSION}.tar.gz --yes
+RUN gosu weewx weectl extension install https://github.com/sankara/weewx-skin-aero/releases/download/v${AERO_VERSION}/weewx-aero-v${AERO_VERSION}.zip
 RUN gosu weewx weectl extension install https://github.com/weewx-mqtt/subscribe/archive/refs/tags/v${MQTTSUBSCRIBE_VERSION}.zip --yes
 
 
 # NeoWX overrides
 COPY overrides/neowx-material/skin.conf /home/weewx/weewx-data/skins/neowx-material/skin.conf
 COPY overrides/neowx-material/weathertv.html.tmpl /home/weewx/weewx-data/skins/neowx-material/weathertv.html.tmpl
+
+#Aero overrides
+COPY overrides/Aero/skin.conf /home/weewx/weewx-data/skins/neowx-material/skin.conf
 
 # JSON overrides
 COPY overrides/JSON/skin.conf /home/weewx/weewx-data/skins/JSON/skin.conf
@@ -54,7 +59,8 @@ RUN chown weewx:weewx \
     /home/weewx/weewx-data/skins/neowx-material/skin.conf \
     /home/weewx/weewx-data/skins/neowx-material/weathertv.html.tmpl \
     /home/weewx/weewx-data/skins/JSON/skin.conf \
-    /home/weewx/weewx-data/skins/JSON/weewx-homebridge.json.tmpl
+    /home/weewx/weewx-data/skins/JSON/weewx-homebridge.json.tmpl \
+    /home/weewx/weewx-data/skins/Aero/skin.conf
 
 RUN gosu weewx weectl station reconfigure --no-prompt --no-backup
 
